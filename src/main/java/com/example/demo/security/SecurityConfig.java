@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            // http.authorizeRequests().anyRequest().permitAll();
 
         //spring qui genere le formulaire
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allcategories/**").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allproduits/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/categories/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/produits/**").permitAll();
         http.authorizeRequests().antMatchers("/produits/**").hasAnyAuthority("USER");
@@ -42,5 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public BCryptPasswordEncoder getBCPE(){
         return new BCryptPasswordEncoder();
     }
+
+
 
 }

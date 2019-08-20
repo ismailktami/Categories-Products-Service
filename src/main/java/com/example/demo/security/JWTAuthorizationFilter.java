@@ -36,12 +36,22 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         httpServletResponse.addHeader("OPTIONS","*");
 
 
+        if(httpServletRequest.getRequestURI().equals("/categories") || httpServletRequest.getRequestURI().equals("/produits") ||httpServletRequest.getRequestURI().equals("/Allcategories") || httpServletRequest.getRequestURI().contains("/Allproduits"))
+        {
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(httpServletRequest,httpServletResponse);
+            return;
+        }
 
+        if(jwt==null || !jwt.startsWith(SecurityParams.HEADER_PREFIX )){
 
-        if(jwt==null || !jwt.startsWith(SecurityParams.HEADER_PREFIX)){
+            System.err.println(httpServletRequest.getRequestURI());
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }
+
+
+
         else{
             JWTVerifier jwtVerifier= JWT.require(Algorithm.HMAC256(SecurityParams.PRIVATE_KEY)).build();
             String token=jwt.substring(SecurityParams.HEADER_PREFIX.length());
