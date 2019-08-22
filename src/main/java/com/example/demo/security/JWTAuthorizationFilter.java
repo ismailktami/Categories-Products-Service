@@ -23,52 +23,52 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-
+        System.out.println(httpServletRequest.getRequestURI());
         String jwt=httpServletRequest.getHeader(SecurityParams.JWT_HEADER);
+        httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.addHeader("Access-Control-Allow-Headers","Origin, Accept,X-Requested-With, Accept,Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,Authorization");
+        httpServletResponse.addHeader("OPTIONS","*");
+        httpServletResponse.addHeader("Access-Control-Expose-Headers","Access-Control-Allow-Origin,Access-Control-Allow-Credentials, Authorization");        httpServletResponse.addHeader("OPTIONS","*");
+        httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE,PUT");
+        if(httpServletRequest.getMethod().equals("PUT"))
+            System.out.println("PUT");
 
-        httpServletResponse.addHeader("Access-Control-Allow-Origin","*");
-        httpServletResponse.addHeader("Access-Control-Allow-Headers","Origin, Accept,X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,Authorization");
-        httpServletResponse.addHeader("Access-Control-Expose-Headers","Access-Control-Allow-Origin,Access-Control-Allow-Credentials, Authorization");
+        if(httpServletRequest.getMethod().equals("DEL"))
+            System.out.println("DEL");
 
-        if(httpServletRequest.getMethod().equals("OPTIONS")){
+        if(httpServletRequest.getMethod().equals("OPTIONS") || httpServletRequest.getRequestURI().equals("/Allcategories") ||  httpServletRequest.getRequestURI().contains("/Allproduits")){
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+           filterChain.doFilter(httpServletRequest,httpServletResponse);return;
         }
+
+       else {
+            if (jwt == null || !jwt.startsWith(SecurityParams.HEADER_PREFIX)) {
+                System.err.println(httpServletRequest.getRequestURI());
+                httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                filterChain.doFilter(httpServletRequest, httpServletResponse);
+            } else {
+                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(SecurityParams.PRIVATE_KEY)).build();
+                String token = jwt.substring(SecurityParams.HEADER_PREFIX.length());
+                DecodedJWT decodeJwt = jwtVerifier.verify(token);
+                List<String> roles = decodeJwt.getClaim("roles").asList(String.class);
+                System.out.println("roles++++++++++++++" + roles);
+                Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+                String username = decodeJwt.getSubject();
+                for (String role : roles) {
+                    authorities.add(new SimpleGrantedAuthority(role));
+                }
+                UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(user);
+                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                filterChain.doFilter(httpServletRequest, httpServletResponse);
+
+
+            }
+        }
+
         httpServletResponse.addHeader("OPTIONS","*");
 
-
-        if(httpServletRequest.getRequestURI().equals("/categories") || httpServletRequest.getRequestURI().equals("/produits") ||httpServletRequest.getRequestURI().equals("/Allcategories") || httpServletRequest.getRequestURI().contains("/Allproduits"))
-        {
-            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-            filterChain.doFilter(httpServletRequest,httpServletResponse);
-            return;
-        }
-
-        if(jwt==null || !jwt.startsWith(SecurityParams.HEADER_PREFIX )){
-
-            System.err.println(httpServletRequest.getRequestURI());
-            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            filterChain.doFilter(httpServletRequest,httpServletResponse);
-        }
-
-
-
-        else{
-            JWTVerifier jwtVerifier= JWT.require(Algorithm.HMAC256(SecurityParams.PRIVATE_KEY)).build();
-            String token=jwt.substring(SecurityParams.HEADER_PREFIX.length());
-            DecodedJWT decodeJwt= jwtVerifier.verify(token);
-            List<String> roles=decodeJwt.getClaim("roles").asList(String.class);
-            System.out.println("roles++++++++++++++"+roles);
-            Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-            String username=decodeJwt.getSubject();
-            for (String role : roles) {
-                authorities.add(new SimpleGrantedAuthority(role));
-            }
-            UsernamePasswordAuthenticationToken user=new UsernamePasswordAuthenticationToken(username,null,authorities);
-            SecurityContextHolder.getContext().setAuthentication(user);
-            filterChain.doFilter(httpServletRequest,httpServletResponse);
-        }
     }
-
 
 
 

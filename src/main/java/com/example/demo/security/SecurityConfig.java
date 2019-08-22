@@ -19,13 +19,13 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Override
+    /*@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     BCryptPasswordEncoder bcpe=getBCPE();
     auth.inMemoryAuthentication().withUser("admin").password(bcpe.encode("admin")).roles("ADMIN","USER");
     auth.inMemoryAuthentication().withUser("user").password(bcpe.encode("user")).roles("USER");
 
-    }
+    }*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -34,15 +34,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
            // http.authorizeRequests().anyRequest().permitAll();
 
         //spring qui genere le formulaire
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allcategories/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allproduits/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/categories/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/produits/**").permitAll();
-        http.authorizeRequests().antMatchers("/produits/**").hasAnyAuthority("USER");
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allcategories/**","/Allproduits/**","/categories/**","/produits/**").permitAll();
+
+
         http.authorizeRequests().antMatchers("/categories/**").hasAnyAuthority("ADMIN");
+        http.authorizeRequests().antMatchers("/Allcategories/**").hasAnyAuthority("ADMIN");
+
+        http.authorizeRequests().antMatchers("/produits/**").hasAnyAuthority("USER");
+        http.authorizeRequests().antMatchers("/Allproduits/**").hasAnyAuthority("USER");
+
         http.authorizeRequests().anyRequest().authenticated();
 
         http.addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors();
+
     }
 
     @Bean
