@@ -25,7 +25,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         System.out.println(httpServletRequest.getRequestURI());
         String jwt=httpServletRequest.getHeader(SecurityParams.JWT_HEADER);
-        httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
         httpServletResponse.addHeader("Access-Control-Allow-Headers","Origin, Accept,X-Requested-With, Accept,Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,Authorization");
         httpServletResponse.addHeader("OPTIONS","*");
         httpServletResponse.addHeader("Access-Control-Expose-Headers","Access-Control-Allow-Origin,Access-Control-Allow-Credentials, Authorization");        httpServletResponse.addHeader("OPTIONS","*");
@@ -36,11 +36,15 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         if(httpServletRequest.getMethod().equals("DEL"))
             System.out.println("DEL");
 
-        if(httpServletRequest.getMethod().equals("OPTIONS") || httpServletRequest.getRequestURI().equals("/Allcategories") ||  httpServletRequest.getRequestURI().contains("/Allproduits")){
+        if(httpServletRequest.getRequestURI().equals("/Allcategories") ||  httpServletRequest.getRequestURI().contains("/Allproduits")){
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-           filterChain.doFilter(httpServletRequest,httpServletResponse);return;
+            filterChain.doFilter(httpServletRequest,httpServletResponse);
+           return;
         }
 
+        if(httpServletRequest.getMethod().equals("OPTIONS")){
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+        }
        else {
             if (jwt == null || !jwt.startsWith(SecurityParams.HEADER_PREFIX)) {
                 System.err.println(httpServletRequest.getRequestURI());

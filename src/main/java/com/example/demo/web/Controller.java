@@ -37,7 +37,6 @@ public class Controller {
     public Category updateCategorie(@RequestBody Category category){
        return  categoryRepository.save(category);
     }
-    @CrossOrigin("*")
     @DeleteMapping("/categories/{id}")
     public Category deleteCategory(@PathVariable("id") String id){
         Category c=categoryRepository.findById(id).get();
