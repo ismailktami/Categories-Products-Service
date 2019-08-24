@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data @AllArgsConstructor @NoArgsConstructor  @Getter  @Setter
 public class Produit {
     @Id
+    @Generated
     private String id;
     private String nom;
     private double price;

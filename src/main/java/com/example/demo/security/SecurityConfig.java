@@ -35,8 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //spring qui genere le formulaire
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/Allcategories/**","/Allproduits/**","/categories/**","/produits/**").permitAll();
-
-
         http.authorizeRequests().antMatchers("/categories/**").hasAnyAuthority("ADMIN");
         http.authorizeRequests().antMatchers("/Allcategories/**").hasAnyAuthority("ADMIN");
 

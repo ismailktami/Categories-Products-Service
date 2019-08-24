@@ -6,6 +6,7 @@ import com.example.demo.entities.Category;
 import com.example.demo.entities.Produit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Role;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.PermitAll;
@@ -44,6 +45,49 @@ public class Controller {
         return c;
     }
 
+    @PostMapping("categories")
+    public Category addCategory(@RequestBody Category c){
+        return categoryRepository.save(c);
+    }
+
+
+    @PostMapping("categories/{id}/addProduit")
+    public Produit addProduitToCategory(@PathVariable("id") String id,@RequestBody Produit p){
+        System.err.println(p.getNom());
+        System.err.println(p.getPrice());
+        p.setId(Math.random()*100+" ");
+        Category c=categoryRepository.findById(id).get();
+        p.setCategory(c);
+        c.getProduis().add(p);
+        categoryRepository.save(c);
+        produitRepository.save(p);
+        return p;
+    }
+   @PostMapping("categories/{id}/editProduit")
+    public Produit modifyProduitToCategory(@PathVariable("id") String id,@RequestBody Produit p){
+        //produitRepository.findByCategory(id);
+
+        return   produitRepository.save(p);
+
+    }
+
+    @DeleteMapping("categories/{id}/deleteproduit/{idProduit}")
+    public Produit deleteProduitToCategory(@PathVariable("id") String id,@PathVariable("idProduit") String p){
+
+
+        /*
+        c.getProduis().removeIf(
+                produit->(
+                        produit.getId().equals(p.getId())
+        ));
+        categoryRepository.save(c);
+        produitRepository.delete(p);
+           return p;
+
+  */
+
+    return null;
+    }
 
 
 
